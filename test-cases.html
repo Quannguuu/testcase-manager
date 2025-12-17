@@ -6,8 +6,6 @@
     <title>TestCase Manager - Test Cases</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="data.js"></script>
-    <script src="test-cases.js"></script>
 </head>
 <body>
     <div class="container">
@@ -78,7 +76,11 @@
             </div>
             
             <div class="test-cases-list" id="testCasesList">
-                <!-- Test cases will be populated here by JavaScript -->
+                <!-- Loading state -->
+                <div class="loading-state" id="loadingState">
+                    <div class="loading-spinner"></div>
+                    <p>Loading test cases...</p>
+                </div>
             </div>
             
             <div class="summary-section">
@@ -106,6 +108,7 @@
         </footer>
     </div>
 
+    <script src="data.js"></script>
     <script src="test-cases.js"></script>
 </body>
 </html>

@@ -1,5 +1,12 @@
 // data.js - Dữ liệu và tiện ích chung cho TestCase Manager
 
+console.log('Loading data.js...');
+
+// Tạo object chứa dữ liệu và hàm nếu chưa tồn tại
+if (!window.testCaseManagerData) {
+    window.testCaseManagerData = {};
+}
+
 // Dữ liệu test cases
 const testCasesData = [
     {
@@ -65,86 +72,18 @@ const testCasesData = [
     }
 ];
 
-// Dữ liệu test suites
-const testSuitesData = [
-    {
-        name: "Authentication",
-        testCount: 3,
-        passed: 1,
-        failed: 1,
-        pending: 1,
-        blocked: 0
-    },
-    {
-        name: "Shopping Cart",
-        testCount: 1,
-        passed: 0,
-        failed: 0,
-        pending: 1,
-        blocked: 0
-    },
-    {
-        name: "Checkout",
-        testCount: 1,
-        passed: 0,
-        failed: 0,
-        pending: 1,
-        blocked: 1
-    }
-];
-
-// Dữ liệu thống kê dashboard
-const dashboardStats = {
-    totalTestCases: 5,
-    passed: 2,
-    failed: 1,
-    pending: 1,
-    blocked: 1,
-    passRate: 40, // percentage
-    needsAttention: 2,
-    lastUpdated: new Date().toISOString()
-};
-
-// Priority data with colors and labels
-const priorityData = {
-    critical: {
-        count: 2,
-        percentage: 40,
-        color: "#e74c3c",
-        label: "Critical"
-    },
-    high: {
-        count: 2,
-        percentage: 40,
-        color: "#e67e22",
-        label: "High"
-    },
-    medium: {
-        count: 1,
-        percentage: 20,
-        color: "#f39c12",
-        label: "Medium"
-    },
-    low: {
-        count: 0,
-        percentage: 0,
-        color: "#95a5a6",
-        label: "Low"
-    }
-};
-
-// Hàm lấy dữ liệu test cases (có thể mở rộng để fetch từ API)
-function getTestCases() {
+// Hàm lấy dữ liệu test cases
+window.testCaseManagerData.getTestCases = function() {
     return testCasesData;
-}
+};
 
 // Hàm lấy test case theo ID
-function getTestCaseById(id) {
+window.testCaseManagerData.getTestCaseById = function(id) {
     return testCasesData.find(testCase => testCase.id === id);
-}
+};
 
 // Hàm lọc test cases theo bộ lọc
-function filterTestCases(filters = {}) {
+window.testCaseManagerData.filterTestCases = function(filters = {}) {
     const {
         searchTerm = '',
         suite = 'all',
@@ -155,7 +94,7 @@ function filterTestCases(filters = {}) {
     return testCasesData.filter(testCase => {
         const matchesSearch = searchTerm === '' || 
             testCase.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            testCase.description.toLowerCase().includes(searchTerm.toLowerCase());
+            (testCase.description && testCase.description.toLowerCase().includes(searchTerm.toLowerCase()));
         
         const matchesSuite = suite === 'all' || testCase.suite === suite;
         const matchesPriority = priority === 'all' || testCase.priority === priority;
@@ -163,10 +102,10 @@ function filterTestCases(filters = {}) {
         
         return matchesSearch && matchesSuite && matchesPriority && matchesStatus;
     });
-}
+};
 
 // Hàm cập nhật test case
-function updateTestCase(id, updates) {
+window.testCaseManagerData.updateTestCase = function(id, updates) {
     const index = testCasesData.findIndex(testCase => testCase.id === id);
     
     if (index !== -1) {
@@ -175,24 +114,24 @@ function updateTestCase(id, updates) {
     }
     
     return false;
-}
+};
 
 // Hàm thêm test case mới
-function addTestCase(testCase) {
-    const newId = Math.max(...testCasesData.map(tc => tc.id)) + 1;
+window.testCaseManagerData.addTestCase = function(testCase) {
+    const newId = testCasesData.length > 0 ? Math.max(...testCasesData.map(tc => tc.id)) + 1 : 1;
     const newTestCase = {
         ...testCase,
         id: newId,
-        date: new Date().toISOString().split('T')[0], // YYYY-MM-DD format
+        date: new Date().toISOString().split('T')[0], // Định dạng YYYY-MM-DD
         selected: false
     };
     
     testCasesData.push(newTestCase);
     return newTestCase;
-}
+};
 
 // Hàm xóa test case
-function deleteTestCase(id) {
+window.testCaseManagerData.deleteTestCase = function(id) {
     const index = testCasesData.findIndex(testCase => testCase.id === id);
     
     if (index !== -1) {
@@ -201,11 +140,10 @@ function deleteTestCase(id) {
     }
     
     return false;
-}
+};
 
 // Hàm lấy thống kê dashboard
-function getDashboardStats() {
-    // Tính toán thống kê mới nhất từ dữ liệu
+window.testCaseManagerData.getDashboardStats = function() {
     const total = testCasesData.length;
     const passed = testCasesData.filter(tc => tc.status === 'passed').length;
     const failed = testCasesData.filter(tc => tc.status === 'failed').length;
@@ -225,11 +163,10 @@ function getDashboardStats() {
         needsAttention,
         lastUpdated: new Date().toISOString()
     };
-}
+};
 
 // Hàm lấy dữ liệu test suites
-function getTestSuites() {
-    // Tính toán từ dữ liệu test cases
+window.testCaseManagerData.getTestSuites = function() {
     const suites = {};
     
     testCasesData.forEach(testCase => {
@@ -263,11 +200,10 @@ function getTestSuites() {
     });
     
     return Object.values(suites);
-}
+};
 
 // Hàm lấy dữ liệu priority
-function getPriorityData() {
-    // Tính toán từ dữ liệu test cases
+window.testCaseManagerData.getPriorityData = function() {
     const priorities = {
         critical: { count: 0, percentage: 0, color: "#e74c3c", label: "Critical" },
         high: { count: 0, percentage: 0, color: "#e67e22", label: "High" },
@@ -290,23 +226,23 @@ function getPriorityData() {
     });
     
     return priorities;
-}
+};
 
 // Hàm lấy test cases được chọn
-function getSelectedTestCases() {
+window.testCaseManagerData.getSelectedTestCases = function() {
     return testCasesData.filter(testCase => testCase.selected);
-}
+};
 
 // Hàm chọn/bỏ chọn tất cả test cases
-function toggleSelectAll(selectAll) {
+window.testCaseManagerData.toggleSelectAll = function(selectAll) {
     testCasesData.forEach(testCase => {
         testCase.selected = selectAll;
     });
-}
+};
 
 // Hàm xuất test cases đã chọn
-function exportSelectedTestCases(format = 'json') {
-    const selected = getSelectedTestCases();
+window.testCaseManagerData.exportSelectedTestCases = function(format = 'json') {
+    const selected = this.getSelectedTestCases();
     
     if (selected.length === 0) {
         return null;
@@ -319,12 +255,12 @@ function exportSelectedTestCases(format = 'json') {
         const headers = ['ID', 'Title', 'Suite', 'Priority', 'Status', 'Date', 'Description'];
         const rows = selected.map(tc => [
             tc.id,
-            `"${tc.title}"`,
+            `"${tc.title.replace(/"/g, '""')}"`,
             tc.suite,
             tc.priority,
             tc.status,
             tc.date,
-            `"${tc.description || ''}"`
+            `"${(tc.description || '').replace(/"/g, '""')}"`
         ]);
         
         const csvContent = [
@@ -336,22 +272,30 @@ function exportSelectedTestCases(format = 'json') {
     }
     
     return null;
-}
+};
 
 // Hàm định dạng ngày tháng
-function formatDate(dateString) {
+window.testCaseManagerData.formatDate = function(dateString) {
     if (!dateString) return 'Never';
     
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
-}
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            return dateString;
+        }
+        
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    } catch (error) {
+        return dateString;
+    }
+};
 
 // Hàm lấy màu sắc cho status
-function getStatusColor(status) {
+window.testCaseManagerData.getStatusColor = function(status) {
     const colors = {
         passed: '#2ecc71',
         failed: '#e74c3c',
@@ -360,10 +304,10 @@ function getStatusColor(status) {
     };
     
     return colors[status] || '#7f8c8d';
-}
+};
 
 // Hàm lấy icon cho status
-function getStatusIcon(status) {
+window.testCaseManagerData.getStatusIcon = function(status) {
     const icons = {
         passed: 'fa-check-circle',
         failed: 'fa-times-circle',
@@ -372,10 +316,10 @@ function getStatusIcon(status) {
     };
     
     return icons[status] || 'fa-question-circle';
-}
+};
 
 // Hàm lấy màu sắc cho priority
-function getPriorityColor(priority) {
+window.testCaseManagerData.getPriorityColor = function(priority) {
     const colors = {
         critical: '#e74c3c',
         high: '#e67e22',
@@ -384,62 +328,10 @@ function getPriorityColor(priority) {
     };
     
     return colors[priority] || '#7f8c8d';
-}
+};
 
-// Hàm lấy icon cho priority
-function getPriorityIcon(priority) {
-    return 'fa-flag';
-}
+// Export dữ liệu để truy cập trực tiếp
+window.testCaseManagerData.testCasesData = testCasesData;
 
-// Xuất các hàm và dữ liệu để sử dụng ở các file khác
-if (typeof module !== 'undefined' && module.exports) {
-    // Node.js environment
-    module.exports = {
-        testCasesData,
-        testSuitesData,
-        dashboardStats,
-        priorityData,
-        getTestCases,
-        getTestCaseById,
-        filterTestCases,
-        updateTestCase,
-        addTestCase,
-        deleteTestCase,
-        getDashboardStats,
-        getTestSuites,
-        getPriorityData,
-        getSelectedTestCases,
-        toggleSelectAll,
-        exportSelectedTestCases,
-        formatDate,
-        getStatusColor,
-        getStatusIcon,
-        getPriorityColor,
-        getPriorityIcon
-    };
-} else {
-    // Browser environment - gắn vào window object
-    window.testCaseManagerData = {
-        testCasesData,
-        testSuitesData,
-        dashboardStats,
-        priorityData,
-        getTestCases,
-        getTestCaseById,
-        filterTestCases,
-        updateTestCase,
-        addTestCase,
-        deleteTestCase,
-        getDashboardStats,
-        getTestSuites,
-        getPriorityData,
-        getSelectedTestCases,
-        toggleSelectAll,
-        exportSelectedTestCases,
-        formatDate,
-        getStatusColor,
-        getStatusIcon,
-        getPriorityColor,
-        getPriorityIcon
-    };
-}
+console.log('data.js loaded successfully');
+console.log('Available functions:', Object.keys(window.testCaseManagerData).filter(key => typeof window.testCaseManagerData[key] === 'function'));

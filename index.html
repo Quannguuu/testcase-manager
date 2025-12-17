@@ -6,8 +6,6 @@
     <title>TestCase Manager - Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="data.js"></script>
-    <script src="dashboard.js"></script>
 </head>
 <body>
     <div class="container">
@@ -98,32 +96,7 @@
                     </div>
                     <div class="card-body">
                         <div class="suite-list">
-                            <div class="suite-item">
-                                <div class="suite-name">Authentication</div>
-                                <div class="suite-stats">
-                                    <span class="suite-count">3 tests</span>
-                                    <span class="suite-status passed-count"><i class="fas fa-circle"></i> Passed 1</span>
-                                    <span class="suite-status failed-count"><i class="fas fa-circle"></i> Failed 1</span>
-                                    <span class="suite-status pending-count"><i class="fas fa-circle"></i> Pending 1</span>
-                                </div>
-                            </div>
-                            <div class="suite-item">
-                                <div class="suite-name">Shopping Cart</div>
-                                <div class="suite-stats">
-                                    <span class="suite-count">1 test</span>
-                                    <span class="suite-status passed-count"><i class="fas fa-circle"></i> Passed 0</span>
-                                    <span class="suite-status pending-count"><i class="fas fa-circle"></i> Pending 1</span>
-                                </div>
-                            </div>
-                            <div class="suite-item">
-                                <div class="suite-name">Checkout</div>
-                                <div class="suite-stats">
-                                    <span class="suite-count">1 test</span>
-                                    <span class="suite-status passed-count"><i class="fas fa-circle"></i> Passed 0</span>
-                                    <span class="suite-status pending-count"><i class="fas fa-circle"></i> Pending 1</span>
-                                    <span class="suite-status blocked-count"><i class="fas fa-circle"></i> Blocked 1</span>
-                                </div>
-                            </div>
+                            <!-- Filled by JavaScript -->
                         </div>
                     </div>
                 </div>
@@ -136,46 +109,7 @@
                     </div>
                     <div class="card-body">
                         <div class="priority-chart">
-                            <div class="priority-item">
-                                <div class="priority-label">
-                                    <span class="priority-dot critical-dot"></span>
-                                    Critical
-                                </div>
-                                <div class="priority-bar">
-                                    <div class="priority-fill" style="width: 40%; background-color: #e74c3c;"></div>
-                                </div>
-                                <div class="priority-value">2 (40%)</div>
-                            </div>
-                            <div class="priority-item">
-                                <div class="priority-label">
-                                    <span class="priority-dot high-dot"></span>
-                                    High
-                                </div>
-                                <div class="priority-bar">
-                                    <div class="priority-fill" style="width: 40%; background-color: #e67e22;"></div>
-                                </div>
-                                <div class="priority-value">2 (40%)</div>
-                            </div>
-                            <div class="priority-item">
-                                <div class="priority-label">
-                                    <span class="priority-dot medium-dot"></span>
-                                    Medium
-                                </div>
-                                <div class="priority-bar">
-                                    <div class="priority-fill" style="width: 20%; background-color: #f39c12;"></div>
-                                </div>
-                                <div class="priority-value">1 (20%)</div>
-                            </div>
-                            <div class="priority-item">
-                                <div class="priority-label">
-                                    <span class="priority-dot low-dot"></span>
-                                    Low
-                                </div>
-                                <div class="priority-bar">
-                                    <div class="priority-fill" style="width: 0%; background-color: #95a5a6;"></div>
-                                </div>
-                                <div class="priority-value">0 (0%)</div>
-                            </div>
+                            <!-- Filled by JavaScript -->
                         </div>
                         <div class="total-count">
                             <strong>Total Test Cases: 5</strong>
@@ -190,6 +124,7 @@
         </footer>
     </div>
 
+    <script src="data.js"></script>
     <script src="dashboard.js"></script>
 </body>
 </html>

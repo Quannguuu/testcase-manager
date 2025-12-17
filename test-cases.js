@@ -1,29 +1,67 @@
 // test-cases.js - Sử dụng data.js
 
-// Khởi tạo với dữ liệu từ data.js
-const testCases = window.testCaseManagerData.testCasesData;
+console.log('Loading test-cases.js...');
 
 // Initialize the test cases list
 function renderTestCases() {
     const testCasesList = document.getElementById('testCasesList');
+    if (!testCasesList) {
+        console.error('testCasesList element not found!');
+        return;
+    }
+    
     const showingCount = document.getElementById('showingCount');
+    if (!showingCount) {
+        console.error('showingCount element not found!');
+        return;
+    }
     
     // Get filter values
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const suiteFilter = document.getElementById('suiteFilter').value;
-    const priorityFilter = document.getElementById('priorityFilter').value;
-    const statusFilter = document.getElementById('statusFilter').value;
+    const searchInput = document.getElementById('searchInput');
+    const suiteFilter = document.getElementById('suiteFilter');
+    const priorityFilter = document.getElementById('priorityFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    
+    if (!searchInput || !suiteFilter || !priorityFilter || !statusFilter) {
+        console.error('Filter elements not found!');
+        return;
+    }
+    
+    const searchTerm = searchInput.value.toLowerCase();
+    const suiteFilterValue = suiteFilter.value;
+    const priorityFilterValue = priorityFilter.value;
+    const statusFilterValue = statusFilter.value;
     
     // Sử dụng hàm filter từ data.js
     const filteredTestCases = window.testCaseManagerData.filterTestCases({
         searchTerm,
-        suite: suiteFilter,
-        priority: priorityFilter,
-        status: statusFilter
+        suite: suiteFilterValue,
+        priority: priorityFilterValue,
+        status: statusFilterValue
     });
     
     // Clear the list
     testCasesList.innerHTML = '';
+    
+    // Ẩn loading state
+    const loadingState = document.getElementById('loadingState');
+    if (loadingState) {
+        loadingState.style.display = 'none';
+    }
+    
+    // Nếu không có test case nào
+    if (filteredTestCases.length === 0) {
+        testCasesList.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h3>No test cases found</h3>
+                <p>Try adjusting your search or filters</p>
+            </div>
+        `;
+        
+        showingCount.textContent = '0';
+        return;
+    }
     
     // Render filtered test cases
     filteredTestCases.forEach(testCase => {
@@ -82,11 +120,18 @@ function renderTestCases() {
         
         // Add event listener to the checkbox
         const checkbox = testCaseElement.querySelector(`#testCase${testCase.id}`);
-        checkbox.addEventListener('change', function() {
-            testCase.selected = this.checked;
-            updateSelectedCount();
-            updateSelectAllCheckbox();
-        });
+        if (checkbox) {
+            checkbox.addEventListener('change', function() {
+                // Cập nhật dữ liệu trong data.js
+                const testCasesData = window.testCaseManagerData.testCasesData;
+                const testCaseToUpdate = testCasesData.find(tc => tc.id === testCase.id);
+                if (testCaseToUpdate) {
+                    testCaseToUpdate.selected = this.checked;
+                }
+                updateSelectedCount();
+                updateSelectAllCheckbox();
+            });
+        }
         
         testCasesList.appendChild(testCaseElement);
     });
@@ -99,7 +144,10 @@ function renderTestCases() {
 function updateSelectedCount() {
     const selectedTestCases = window.testCaseManagerData.getSelectedTestCases();
     const selectedCount = selectedTestCases.length;
-    document.getElementById('selectedCount').textContent = selectedCount;
+    const selectedCountElement = document.getElementById('selectedCount');
+    if (selectedCountElement) {
+        selectedCountElement.textContent = selectedCount;
+    }
 }
 
 // Update Select All checkbox state
@@ -109,68 +157,96 @@ function updateSelectAllCheckbox() {
     const someSelected = testCases.some(testCase => testCase.selected);
     
     const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-    selectAllCheckbox.checked = allSelected;
-    selectAllCheckbox.indeterminate = !allSelected && someSelected;
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = allSelected;
+        selectAllCheckbox.indeterminate = !allSelected && someSelected;
+    }
 }
 
-// Select All functionality
-document.getElementById('selectAllCheckbox').addEventListener('change', function() {
-    const isChecked = this.checked;
-    
-    window.testCaseManagerData.toggleSelectAll(isChecked);
-    
-    renderTestCases();
-    updateSelectedCount();
-});
-
-// Search functionality
-document.getElementById('searchInput').addEventListener('input', function() {
-    renderTestCases();
-});
-
-// Filter functionality
-document.getElementById('suiteFilter').addEventListener('change', function() {
-    renderTestCases();
-});
-
-document.getElementById('priorityFilter').addEventListener('change', function() {
-    renderTestCases();
-});
-
-document.getElementById('statusFilter').addEventListener('change', function() {
-    renderTestCases();
-});
-
-// Export functionality
-document.getElementById('exportBtn').addEventListener('click', function() {
-    const selectedTestCases = window.testCaseManagerData.getSelectedTestCases();
-    
-    if (selectedTestCases.length === 0) {
-        alert('Please select at least one test case to export.');
-        return;
+// Chỉ gắn event listeners khi các element tồn tại
+function setupEventListeners() {
+    // Select All functionality
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            const isChecked = this.checked;
+            window.testCaseManagerData.toggleSelectAll(isChecked);
+            renderTestCases();
+            updateSelectedCount();
+        });
+    } else {
+        console.warn('selectAllCheckbox element not found');
     }
     
-    const exportData = window.testCaseManagerData.exportSelectedTestCases('json');
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            renderTestCases();
+        });
+    } else {
+        console.warn('searchInput element not found');
+    }
     
-    // Tạo file download
-    const blob = new Blob([exportData], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `test-cases-export-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Filter functionality
+    const suiteFilter = document.getElementById('suiteFilter');
+    if (suiteFilter) {
+        suiteFilter.addEventListener('change', function() {
+            renderTestCases();
+        });
+    }
     
-    alert(`Exported ${selectedTestCases.length} test case(s) successfully.`);
-});
-
-// Add test case functionality
-document.getElementById('addTestCaseBtn').addEventListener('click', function() {
-    // Mở modal thêm test case
-    openAddTestCaseModal();
-});
+    const priorityFilter = document.getElementById('priorityFilter');
+    if (priorityFilter) {
+        priorityFilter.addEventListener('change', function() {
+            renderTestCases();
+        });
+    }
+    
+    const statusFilter = document.getElementById('statusFilter');
+    if (statusFilter) {
+        statusFilter.addEventListener('change', function() {
+            renderTestCases();
+        });
+    }
+    
+    // Export functionality
+    const exportBtn = document.getElementById('exportBtn');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', function() {
+            const selectedTestCases = window.testCaseManagerData.getSelectedTestCases();
+            
+            if (selectedTestCases.length === 0) {
+                alert('Please select at least one test case to export.');
+                return;
+            }
+            
+            const exportData = window.testCaseManagerData.exportSelectedTestCases('json');
+            
+            // Tạo file download
+            const blob = new Blob([exportData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `test-cases-export-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`Exported ${selectedTestCases.length} test case(s) successfully.`);
+        });
+    }
+    
+    // Add test case functionality
+    const addTestCaseBtn = document.getElementById('addTestCaseBtn');
+    if (addTestCaseBtn) {
+        addTestCaseBtn.addEventListener('click', function() {
+            // Mở modal thêm test case
+            openAddTestCaseModal();
+        });
+    }
+}
 
 // Modal thêm test case
 function openAddTestCaseModal() {
@@ -238,127 +314,6 @@ function openAddTestCaseModal() {
     // Thêm modal vào DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    // Thêm CSS cho modal
-    const modalCSS = `
-        <style>
-            .modal-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.5);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-                animation: fadeIn 0.3s ease;
-            }
-            
-            .modal {
-                background-color: white;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-                width: 90%;
-                max-width: 600px;
-                max-height: 90vh;
-                display: flex;
-                flex-direction: column;
-                animation: slideIn 0.3s ease;
-            }
-            
-            .modal-header {
-                padding: 20px 25px;
-                border-bottom: 1px solid #ecf0f1;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            
-            .modal-header h3 {
-                font-size: 18px;
-                font-weight: 600;
-                color: #2c3e50;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            
-            .modal-close {
-                background: none;
-                border: none;
-                font-size: 24px;
-                color: #95a5a6;
-                cursor: pointer;
-                line-height: 1;
-            }
-            
-            .modal-close:hover {
-                color: #e74c3c;
-            }
-            
-            .modal-body {
-                padding: 25px;
-                overflow-y: auto;
-                flex-grow: 1;
-            }
-            
-            .modal-footer {
-                padding: 20px 25px;
-                border-top: 1px solid #ecf0f1;
-                display: flex;
-                justify-content: flex-end;
-                gap: 10px;
-            }
-            
-            .form-group {
-                margin-bottom: 20px;
-            }
-            
-            .form-row {
-                display: flex;
-                gap: 20px;
-            }
-            
-            .form-row .form-group {
-                flex: 1;
-            }
-            
-            label {
-                display: block;
-                margin-bottom: 8px;
-                font-weight: 500;
-                color: #2c3e50;
-            }
-            
-            input, select, textarea {
-                width: 100%;
-                padding: 10px 12px;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-                font-size: 14px;
-                outline: none;
-                transition: border-color 0.3s;
-            }
-            
-            input:focus, select:focus, textarea:focus {
-                border-color: #3498db;
-            }
-            
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-            
-            @keyframes slideIn {
-                from { transform: translateY(-20px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-        </style>
-    `;
-    
-    document.head.insertAdjacentHTML('beforeend', modalCSS);
-    
     // Xử lý sự kiện modal
     const modal = document.getElementById('addTestCaseModal');
     const closeBtn = document.getElementById('closeModalBtn');
@@ -368,11 +323,6 @@ function openAddTestCaseModal() {
     
     function closeModal() {
         modal.remove();
-        // Xóa style modal
-        const modalStyle = document.querySelector('style:last-of-type');
-        if (modalStyle && modalStyle.textContent.includes('.modal-overlay')) {
-            modalStyle.remove();
-        }
     }
     
     closeBtn.addEventListener('click', closeModal);
@@ -420,13 +370,66 @@ function openAddTestCaseModal() {
     });
 }
 
+// Hiển thị thông báo lỗi
+function showErrorMessage(message) {
+    const testCasesList = document.getElementById('testCasesList');
+    if (testCasesList) {
+        testCasesList.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error Loading Test Cases</h3>
+                <p>${message}</p>
+                <button onclick="location.reload()">
+                    <i class="fas fa-redo"></i> Reload Page
+                </button>
+            </div>
+        `;
+    }
+}
+
 // Initialize the page
-document.addEventListener('DOMContentLoaded', function() {
-    // Set total count
-    const totalTestCases = window.testCaseManagerData.getTestCases().length;
-    document.getElementById('totalCount').textContent = totalTestCases;
+function initializePage() {
+    console.log('DOM loaded, initializing test cases page...');
     
-    renderTestCases();
-    updateSelectedCount();
-    updateSelectAllCheckbox();
-});
+    try {
+        // Kiểm tra dữ liệu đã tải chưa
+        if (!window.testCaseManagerData) {
+            console.error('testCaseManagerData not found!');
+            showErrorMessage('Data module not loaded. Please refresh the page.');
+            return;
+        }
+        
+        console.log('Data module loaded successfully');
+        console.log('Available functions:', Object.keys(window.testCaseManagerData).filter(key => typeof window.testCaseManagerData[key] === 'function'));
+        
+        // Set total count
+        const totalTestCases = window.testCaseManagerData.getTestCases().length;
+        console.log('Total test cases:', totalTestCases);
+        
+        const totalCountElement = document.getElementById('totalCount');
+        if (totalCountElement) {
+            totalCountElement.textContent = totalTestCases;
+        }
+        
+        // Thiết lập event listeners
+        setupEventListeners();
+        
+        // Render test cases ban đầu
+        renderTestCases();
+        updateSelectedCount();
+        updateSelectAllCheckbox();
+        
+        console.log('Test cases page initialized successfully');
+    } catch (error) {
+        console.error('Error initializing page:', error);
+        showErrorMessage('Error loading test cases: ' + error.message);
+    }
+}
+
+// Chỉ gắn event listener một lần
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePage);
+} else {
+    // DOM đã sẵn sàng
+    initializePage();
+}
