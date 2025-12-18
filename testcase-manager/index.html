@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TestCase Manager - Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="logo">
+          <div class="logo-icon">
+            <i class="fas fa-vial"></i>
+          </div>
+          <h1>TestCase Manager</h1>
+        </div>
+        <nav class="main-nav">
+          <a href="index.html" class="nav-link active"
+            ><i class="fas fa-tachometer-alt"></i> Dashboard</a
+          >
+          <a href="test-cases.html" class="nav-link"
+            ><i class="fas fa-list"></i> Test Cases</a
+          >
+        </nav>
+        <div class="user-profile">
+          <div class="user-avatar">JS</div>
+          <span>John Smith</span>
+        </div>
+      </header>
+
+      <div class="dashboard-content">
+        <h2 class="page-title">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </h2>
+        <p class="page-subtitle">Overview of your test case execution</p>
+
+        <div class="stats-grid">
+          <div class="stat-card passed">
+            <div class="stat-title">
+              <i class="fas fa-check-circle"></i> Passed
+            </div>
+            <div class="stat-count">2</div>
+            <div class="stat-note">⭕ 40% pass rate</div>
+          </div>
+
+          <div class="stat-card failed">
+            <div class="stat-title">
+              <i class="fas fa-times-circle"></i> Failed
+            </div>
+            <div class="stat-count">1</div>
+            <div class="stat-note">— Requires attention</div>
+          </div>
+
+          <div class="stat-card pending">
+            <div class="stat-title"><i class="fas fa-clock"></i> Pending</div>
+            <div class="stat-count">1</div>
+            <div class="stat-note">— Not yet tested</div>
+          </div>
+
+          <div class="stat-card blocked">
+            <div class="stat-title"><i class="fas fa-ban"></i> Blocked</div>
+            <div class="stat-count">1</div>
+            <div class="stat-note">— Awaiting resolution</div>
+          </div>
+        </div>
+
+        <div class="dashboard-row">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h3><i class="fas fa-chart-line"></i> Overall Pass Rate</h3>
+            </div>
+            <div class="card-body">
+              <div class="pass-rate-display">
+                <div class="pass-rate-value">40%</div>
+                <div class="pass-rate-label">
+                  Based on 5 total test cases: <strong>2 / 5</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h3>
+                <i class="fas fa-exclamation-triangle"></i> Needs Attention
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="attention-count">2</div>
+              <div class="attention-list">
+                <div class="attention-item">
+                  <i class="fas fa-times-circle failed-icon"></i>
+                  <span>1 failed test case</span>
+                </div>
+                <div class="attention-item">
+                  <i class="fas fa-ban blocked-icon"></i>
+                  <span>1 blocked test case</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-row">
+          <div class="dashboard-card full-width">
+            <div class="card-header">
+              <h3><i class="fas fa-folder"></i> Test Cases by Suite</h3>
+            </div>
+            <div class="card-body">
+              <div class="suite-list">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-row">
+          <div class="dashboard-card full-width">
+            <div class="card-header">
+              <h3><i class="fas fa-flag"></i> Test Cases by Priority</h3>
+            </div>
+            <div class="card-body">
+              <div class="priority-chart">
+                <!-- Filled by JavaScript -->
+              </div>
+              <div class="total-count">
+                <strong>Total Test Cases: 5</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button
+        class="btn-back"
+        name="button"
+        type="button"
+        onclick="window.location.href='test-cases.html'"
+      >
+        View all test cases
+      </button>
+      <footer>
+        <p>TestCase Manager &copy; 2024</p>
+      </footer>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
